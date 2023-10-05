@@ -49,59 +49,51 @@ TOKEN_SCREEN = tm.TM1637(board.GP14, board.GP15)
 INPLAY_COUNT = 0
 TOKEN_COUNT = 0
 
-
 # manage global counts
 def inplay_up():
     global INPLAY_COUNT
-    INPLAY_COUNT += 1
-
+    INPLAY_COUNT +=1
 
 def inplay_down():
     global INPLAY_COUNT
-    INPLAY_COUNT -= 1
-
+    INPLAY_COUNT -=1
 
 def tokens_up():
     global TOKEN_COUNT
-    TOKEN_COUNT += 1
-
+    TOKEN_COUNT +=1
 
 def tokens_down():
     global TOKEN_COUNT
-    TOKEN_COUNT -= 1
-
+    TOKEN_COUNT -=1
 
 # write number to screen
-def write_screen(screen, value):
+def write_screen(screen,value):
     try:
         screen.number(value)
         return "ok"
-    except:
+    except: 
         print("failed to write to screen?")
     sleep(1)
-
 
 # self explanitory
 def blank_screen(screen):
     try:
         screen.number(0000)
         return "ok"
-    except:
+    except: 
         print("failed to write to screen?")
-    sleep(0.5)
-
+    sleep(.5)
 
 def blink_act_led():
     ACT_LED.value = False
-    sleep(0.5)
+    sleep(.5)
     ACT_LED.value = True
-
 
 # add inplay to tokens
 def inplay2tokens():
     global INPLAY_COUNT
     global TOKEN_COUNT
-    TOKEN_COUNT = (INPLAY_COUNT * 2) - 1
+    TOKEN_COUNT = (INPLAY_COUNT * 2)  - 1
     INPLAY_COUNT = TOKEN_COUNT
     write_screen(TOKEN_SCREEN, TOKEN_COUNT)
     write_screen(INPLAY_SCREEN, TOKEN_COUNT)
@@ -112,44 +104,63 @@ blank_screen(TOKEN_SCREEN)
 print(os.uname())
 gc.collect()
 
+
 while True:
+
     INPLAY_UP.update()
     if INPLAY_UP.fell:
-        blink_act_led()
+        print("@DEBUG: INPLAY UP")
+        blink_act_led()   
+        print(f"@DEBUG: INCR INPLAY_COUNT\n {INPLAY_COUNT}")     
         inplay_up()
+        print(f"@DEBUG: RESULT INPLAY_COUNT\n {INPLAY_COUNT}")  
         write_screen(INPLAY_SCREEN, INPLAY_COUNT)
 
     INPLAY_DOWN.update()
     if INPLAY_DOWN.fell:
+        print("\n@DEBUG: INPLAY DOWN")
         blink_act_led()
+        print(f"@DEBUG: DEINCR INPLAY_COUNT \n {INPLAY_COUNT}")            
         inplay_down()
+        print(f"@DEBUG: RESULT INPLAY_COUNT\n {INPLAY_COUNT}")
         write_screen(INPLAY_SCREEN, INPLAY_COUNT)
 
     TOKENS_UP.update()
     if TOKENS_UP.fell:
+        print("\n@DEBUG: TOKEN UP")
         blink_act_led()
+        print(f"@DEBUG: INCR TOKEN_COUNT\n {TOKEN_COUNT}") 
         tokens_up()
         inplay_up()
+        print(f"@DEBUG: RESULT TOKEN_COUNT\n {TOKEN_COUNT}")
+        print(f"@DEBUG: RESULT INPLAY_COUNT\n {INPLAY_COUNT}")  
         write_screen(TOKEN_SCREEN, TOKEN_COUNT)
         write_screen(INPLAY_SCREEN, INPLAY_COUNT)
 
     TOKENS_DOWN.update()
     if TOKENS_DOWN.fell:
+        print("\n@DEBUG: TOKEN DOWN")
         blink_act_led()
+        print(f"@DEBUG: DEINCR TOKEN_COUNT\n {TOKEN_COUNT}")
         tokens_down()
         inplay_down()
+        print(f"@DEBUG: RESULT TOKEN_COUNT\n {TOKEN_COUNT}") 
+        print(f"@DEBUG: RESULT INPLAY_COUNT\n {INPLAY_COUNT}")  
         write_screen(TOKEN_SCREEN, TOKEN_COUNT)
         write_screen(INPLAY_SCREEN, INPLAY_COUNT)
-
+    
     RESET_SCREENS.update()
     if RESET_SCREENS.fell:
+        print("\n@DEBUG: RESET")
         blink_act_led()
         blank_screen(INPLAY_SCREEN)
         blank_screen(TOKEN_SCREEN)
         INPLAY_COUNT = 0
         TOKEN_COUNT = 0
-
+    
     ADD_RATS.update()
     if ADD_RATS.fell:
         blink_act_led()
+        print(f"\n@DEBUG: RATS2TOKENS:\nINPLAY:\t{INPLAY_COUNT}\nTOKENS:\t{TOKEN_COUNT}")
         inplay2tokens()
+        print(f"@DEBUG: RATS2TOKENS:\nINPLAY:\t{INPLAY_COUNT}\nTOKENS:\t{TOKEN_COUNT}")
