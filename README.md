@@ -1,5 +1,6 @@
 # ratcounter
 
+code style : [black](https://github.com/psf/black)
 
 requires adrafruits tricks for circuitpython (debouncer):
 https://learn.adafruit.com/todbot-circuitpython-tricks/
